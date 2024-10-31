@@ -1,34 +1,30 @@
-SRCS = main.c
-LIBSRCS = open.c close.c put.c get.c 
-TARG = kvs_static
-TARG_DYNAMIC = kvs_dynamic
-
 CC = gcc
 OPTS = -Wall -g
-LIBS = -L. -lkvs
+TARG_STATIC = kvs_static
+TARG_DYNAMIC = kvs_dynamic
+LIBA = libkvs.a
+LIBSO = libkvs.so
+LIBSRCS = open.c put.c get.c close.c
+OBJS = main.o
 
-OBJS = $(SRCS:.c=.o)
-LOBJS = $(LIBSRCS:.c=.o)
-LARS = libkvs.a
+static: $(TARG_STATIC)
 
+$(TARG_STATIC): $(OBJS) $(LIBA)
+	$(CC) -o $(TARG_STATIC) $(OBJS) $(LIBA) -static
 
-all: 
+$(LIBA): $(LIBSRCS:.c=.o)
+	ar rcs $(LIBA) $^
 
-static: $(TARG)
+dynamic: $(TARG_DYNAMIC)
 
-$(TARG) : $(OBJS) $(LARS)
-	$(CC) -o $(TARG) $(OBJS) $(LIBS) -static
+$(TARG_DYNAMIC): $(OBJS) $(LIBSO)
+	$(CC) -o $(TARG_DYNAMIC) $(OBJS) -L. -lkvs
 
-$(LARS) : $(LOBJS)
-	ar rs $(LARS) $(LOBJS)
+$(LIBSO): $(LIBSRCS)
+	$(CC) -shared -o $(LIBSO) $(LIBSRCS)
 
 %.o: %.c
 	$(CC) $(OPTS) -c $< -o $@
 
-dynamic: $(TARG_DYNAMIC)
-	$(CC) -o $(TARG) $(OBJS) $(LIBS) 
-
 clean:
-	rm -f $(OBJS) $(LOBJS) $(LARS) $(TARG)
-
-
+	rm -f $(OBJS) $(LIBA) $(LIBSO) $(TARG_STATIC) $(TARG_DYNAMIC)

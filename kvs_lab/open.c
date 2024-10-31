@@ -1,13 +1,16 @@
 #include "kvs.h"
 
+kvs_t* open() {
+  kvs_t *kvs = (kvs_t*)malloc(sizeof(kvs_t));
+  if (!kvs) return NULL;
 
-kvs_t* open()
-{
-	kvs_t* kvs = (kvs_t*) malloc (sizeof(kvs_t));
+  kvs->level = 1;
+  kvs->items = 0;
 
-	if(kvs)
-		kvs->items = 0;
-	printf("Open: kvs has %d items\n", kvs->items);
-
-	return kvs;
+  kvs->header = (node_t*)malloc(sizeof(node_t));
+  kvs->header->forward = (node_t**)malloc(sizeof(node_t*) * MAX_LEVEL);
+  for (int i = 0; i < MAX_LEVEL; i++) {
+    kvs->header->forward[i] = NULL;
+  }
+  return kvs;
 }

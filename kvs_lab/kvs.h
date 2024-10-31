@@ -1,23 +1,27 @@
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
+#ifndef KVS_H
+#define KVS_H
 
-struct node {
-	char key[100];
-	char* value;
-	struct node* next;
-};	
-typedef struct node node_t;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+#define MAX_LEVEL 10 // Skip List의 최대 레벨
 
-struct kvs{
-	struct node* db; // database
-	int items; // number of data 
-};
-typedef struct kvs kvs_t; 
+typedef struct node {
+  char key[100];
+  char *value;
+  struct node **forward;
+} node_t;
 
+typedef struct kvs {
+  node_t *header;
+  int level;
+  int items;
+} kvs_t;
 
 kvs_t* open();
-int close(kvs_t* kvs); // free all memory space 
-int put(kvs_t* kvs, const char* key, const char* value); // return -1 if failed.
-char* get(kvs_t* kvs, const char* key); // return NULL if not found. 
+int close(kvs_t* kvs);
+int put(kvs_t* kvs, const char* key, const char* value);
+char* get(kvs_t* kvs, const char* key);
+
+#endif // KVS_H
